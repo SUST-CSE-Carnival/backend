@@ -43,6 +43,7 @@ class MedicineOrder(Base):
     place = Column(String, nullable=False)
     price = Column(Integer, nullable=False)
     delivered = Column(Integer, nullable=False)
+    reviewChecked = Column(Integer, nullable=False)
 
 
 class MedicineReminder(Base):
@@ -55,6 +56,15 @@ class MedicineReminder(Base):
     user_id = Column(Integer, ForeignKey('users.id'))
     user = relationship("User")
 
- 
+class Review(Base):
+    __tablename__ = 'reviews'
+    id = Column(Integer, primary_key=True,index=True)
+    starCount = Column(Integer, nullable=False)
+    review = Column(String, nullable=False)
+    reviewer_id = Column(Integer, ForeignKey("users.id"))   
+    reviewer =relationship("User", foreign_keys=[reviewer_id])
+    subject_id = Column(Integer, ForeignKey("users.id"))
+    subject =relationship("User", foreign_keys=[subject_id])
+
 
     

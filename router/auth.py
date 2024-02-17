@@ -63,4 +63,13 @@ def pharmacySignup(pharmacy:schemas.PharmacySignup, db:Session = Depends(db.get_
     db.commit()
     db.refresh(pharmacy)
     return pharmacy
+
+@router.get("/profile",response_model=schemas.UserSchema)
+def profile(db:Session = Depends(db.get_db),current_user: models.User = Depends(oauth2.get_current_user)):
+
+    if current_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return current_user
+    
     

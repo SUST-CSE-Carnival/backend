@@ -1,5 +1,17 @@
 from pydantic import BaseModel,EmailStr
 
+class UserSchema(BaseModel):
+    id:int
+    email:EmailStr
+    name:str
+    url:str
+    role:str
+    phone:str
+
+    class Config:
+        orm_mode = True
+
+
 
 class Token(BaseModel):
     id :int
@@ -13,7 +25,6 @@ class Token(BaseModel):
 
     class Config:
         orm_mode = True
-
 
 
 class TokenData(BaseModel):
@@ -101,4 +112,27 @@ class MedicineReminderOut(BaseModel):
     class Config():
         orm_mode = True
 
+
+class ReviewIn(BaseModel):
+    subjectId:int
+    orderId:int
+
+class ReviewOut(BaseModel):
+    id:int
+    subjectId:int
+    reviewerId:int
+    reviewerName:str
+    review:str
+    starCount:int
+
+    class Config:
+        orm_mode = True
+
+class ReviewPending(BaseModel):
+    orderId:int
+    subjectId:int
+    subjectName:str
+
+    class Config():
+        orm_mode = True
 

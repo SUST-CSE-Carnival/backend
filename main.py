@@ -7,7 +7,7 @@ from contextlib import asynccontextmanager
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 import atexit
-from router import auth,medicine,medicine_order,medicine_reminder
+from router import auth,medicine,medicine_order,medicine_reminder,review
 
 
 
@@ -46,3 +46,4 @@ app.include_router(auth.router)
 app.include_router(medicine.router)
 app.include_router(medicine_order.router)
 app.include_router(medicine_reminder.router)
+app.include_router(review.router)

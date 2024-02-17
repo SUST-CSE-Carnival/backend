@@ -14,6 +14,7 @@ router = APIRouter(
 def create_medicine_order(order:MedicineOrderCreate, db:Session = Depends(get_db),current_user:User = Depends(get_current_user)):
     medicine_order = MedicineOrder(description=order.description, place=order.place, price=order.price, user = current_user)
     medicine_order.delivered = 0
+    medicine_order.reviewChecked = 0
     db.add(medicine_order)
     db.commit()
     db.refresh(medicine_order)
