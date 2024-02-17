@@ -1,11 +1,28 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import models
-from db import engine
+from utils import sendMedincineReminders
+from db import engine 
+from contextlib import asynccontextmanager
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.interval import IntervalTrigger
+import atexit
 from router import auth,medicine,medicine_order,medicine_reminder
 
-app = FastAPI()
 
+
+scheduler = AsyncIOScheduler()
+scheduler.start()
+atexit.register(lambda: scheduler.shutdown())
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    trigger = IntervalTrigger(minutes=1)  # Run every 1 minute
+    scheduler.add_job(sendMedincineReminders, trigger=trigger)
+    yield
+    scheduler.shutdown()
+
+app = FastAPI(lifespan=lifespan)
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -16,6 +33,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+
 
 @app.get("/")
 def read_root():

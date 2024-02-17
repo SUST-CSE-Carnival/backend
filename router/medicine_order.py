@@ -11,15 +11,15 @@ router = APIRouter(
 )
    
 @router.post("/create")
-def create_medicine_order(medicine_order:MedicineOrderCreate, db:Session = Depends(get_db)):
-    medicine_order = MedicineOrder(**medicine_order)
+def create_medicine_order(order:MedicineOrderCreate, db:Session = Depends(get_db),current_user:User = Depends(get_current_user)):
+    medicine_order = MedicineOrder(description=order.description, place=order.place, price=order.price, user = current_user)
     medicine_order.delivered = 0
     db.add(medicine_order)
     db.commit()
     db.refresh(medicine_order)
-    return medicine_order
+    return HTTPException(status_code=201, detail="Success")  
 
-@router.put("update/{id}")
+@router.put("/update/{id}")
 def update_medicine_order(id:int, db:Session = Depends(get_db),current_user:User = Depends(get_current_user)):
 
     if current_user.role != "PHARMACY":
@@ -47,14 +47,14 @@ def get_available_medicine_orders(db:Session = Depends(get_db),current_user:User
         medicine_order = db.query(MedicineOrder).filter(MedicineOrder.pharmacy_id == None).filter(MedicineOrder.delivered==0).all()
         available_medicine_order = []
         for order in medicine_order:
-            orderschema = MedicineOrderOut(id = order.id, user_id = order.user_id, name=order.user.name, description = order.description, place = order.place, price = order.price,phone = order.user.phone)
+            orderschema = MedicineOrderOut(id = order.id, user_id = order.user_id, name=order.user.name,email=order.user.email, description = order.description, place = order.place, price = order.price,phone = order.user.phone)
             available_medicine_order.append(orderschema)
 
         return available_medicine_order
     else:
         raise HTTPException(status_code=401, detail="Not Authorized")
     
-    
+
 @router.get("/undelivered/all",status_code=200)
 def get_pending_medicine_orders(db:Session = Depends(get_db),current_user:User = Depends(get_current_user)):
     if current_user.role == "PHARMACY":
@@ -62,7 +62,7 @@ def get_pending_medicine_orders(db:Session = Depends(get_db),current_user:User =
 
         available_medicine_order = []
         for order in medicine_order:
-            orderschema = MedicineOrderOut(id = order.id, user_id = order.user_id, name=order.user.name, description = order.description, place = order.place, price = order.price,phone = order.user.phone)
+            orderschema = MedicineOrderOut(id = order.id, user_id = order.user_id, name=order.user.name,email=order.user.email, description = order.description, place = order.place, price = order.price,phone = order.user.phone)
             available_medicine_order.append(orderschema)
         
         return available_medicine_order
@@ -71,7 +71,7 @@ def get_pending_medicine_orders(db:Session = Depends(get_db),current_user:User =
         medicine_order = db.query(MedicineOrder).filter(MedicineOrder.user_id == current_user.id).filter(MedicineOrder.delivered==0).all()
         available_medicine_order = []
         for order in medicine_order:
-            orderschema = MedicineOrderOut(id = order.id, user_id = order.user_id, name=order.pharmacy.name, description = order.description, place = order.place, price = order.price,phone = order.pharmacy.user.phone)
+            orderschema = MedicineOrderOut(id = order.id, user_id = order.user_id, name=order.pharmacy.name,email = order.pharmacy.email, description = order.description, place = order.place, price = order.price,phone = order.pharmacy.user.phone)
             available_medicine_order.append(orderschema)
 
         return available_medicine_order

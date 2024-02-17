@@ -132,8 +132,8 @@ async def sendSingleMedicineReminder(medicineReminder:MedicineReminder):
                 logging.info("Error sending message")
 
 async def sendMedincineReminders():
-    db = db.SessionLocal()
-    medicineReminders = db.query(MedicineReminder).all()
+    db_current = db.SessionLocal()
+    medicineReminders = db_current.query(MedicineReminder).all()
     for medicineReminder in medicineReminders:
         await sendSingleMedicineReminder(medicineReminder)
 

@@ -12,7 +12,7 @@ def signin(userCredentials:schemas.UserSignin, db:Session = Depends(db.get_db)):
     user = db.query(models.User).filter(models.User.email == userCredentials.email ).first()
     if not user:
         raise HTTPException(status_code= 404, 
-                            detail=f"error")
+                            detail=f"User with email not found")
     
     if not utils.verify(userCredentials.password, user.password):
         raise HTTPException(status_code=404, detail="error")
@@ -34,6 +34,9 @@ def signin(userCredentials:schemas.UserSignin, db:Session = Depends(db.get_db)):
              status_code= 201,
              response_model= schemas.UserOut)
 def signup(user:schemas.UserSignup, db:Session = Depends(db.get_db)):
+    userT = db.query(models.User).filter(models.User.email == user.email).first()
+    if userT:
+        raise HTTPException(status_code=404, detail="User already exists")
     user.password = utils.hash(user.password)
     user = models.User(**user.model_dump())
     user.role ="USER"
@@ -44,6 +47,9 @@ def signup(user:schemas.UserSignup, db:Session = Depends(db.get_db)):
 
 @router.post("/pharmacy/signup")
 def pharmacySignup(pharmacy:schemas.PharmacySignup, db:Session = Depends(db.get_db)):
+    userT = db.query(models.User).filter(models.User.email == user.email).first()
+    if userT:
+        raise HTTPException(status_code=404, detail="User already exists")
     user = pharmacy.user
     user.password = utils.hash(user.password)
     user = models.User(**user.model_dump())

@@ -14,6 +14,11 @@ class Token(BaseModel):
     class Config:
         orm_mode = True
 
+
+
+class TokenData(BaseModel):
+    id:int
+
 class UserSignup(BaseModel):
     email:EmailStr
     password:str
@@ -60,8 +65,6 @@ class MedicineOut(BaseModel):
 
 
 class MedicineOrderCreate(BaseModel):
-    user_id:int
-    pharmacy_id:int
     description:str
     place:str
     price:int
@@ -74,6 +77,7 @@ class MedicineOrderOut(BaseModel):
     id:int
     user_id:int
     name:str
+    email:str
     description:str
     place:str
     price:int
