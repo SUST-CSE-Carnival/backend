@@ -100,18 +100,16 @@ async def send_message(medicine: str, time: str,api_key:str):
    
     fcm_message = messaging.Message(
         notification=messaging.Notification(
-            title='Push Notification',
+            title='Medication Reminder',
             body=f"Time to take {medicine} at {time}"
         ),
         token=api_key
     )
     try:
-      
         response = messaging.send(fcm_message)
-        print("Notification sent successfully!")
-        return {"message": "Notification sent successfully", "response": response}
+        logging.info(f"Successfully sent message")
     except Exception as e:
-        print(f"Error sending notification: {str(e)}")
+        logging.info(f"Error sending message {str(e)}")
    
     
 

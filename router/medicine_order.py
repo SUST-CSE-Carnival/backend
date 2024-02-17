@@ -72,7 +72,11 @@ def get_pending_medicine_orders(db:Session = Depends(get_db),current_user:User =
         medicine_order = db.query(MedicineOrder).filter(MedicineOrder.user_id == current_user.id).filter(MedicineOrder.delivered==0).all()
         available_medicine_order = []
         for order in medicine_order:
-            orderschema = MedicineOrderOut(id = order.id, user_id = order.user_id, name=order.pharmacy.name,email = order.pharmacy.email, description = order.description, place = order.place, price = order.price,phone = order.pharmacy.user.phone)
+            if order.pharmacy is None:
+                orderschema = MedicineOrderOut(id = order.id, user_id = order.user_id, name="null",email ="null", description = order.description, place = order.place, price = order.price,phone = "null")
+            else:
+                pharmacy_shop = db.query(Pharmacy).join(User).filter(User.id == order.pharmacy.id).first()
+                orderschema = MedicineOrderOut(id = order.id, user_id = order.user_id, name=pharmacy_shop.pharmacy_name,email=order.pharmacy.email, description = order.description, place = order.place, price = order.price,phone = order.pharmacy.phone)
             available_medicine_order.append(orderschema)
 
         return available_medicine_order

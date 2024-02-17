@@ -3,7 +3,7 @@ from typing import List
 import oauth2, db
 from fastapi import Depends,HTTPException, APIRouter
 from sqlalchemy.orm import Session
-from models import User, Review, MedicineOrder
+from models import User, Review, MedicineOrder, Pharmacy
 from schemas import ReviewIn, ReviewOut, ReviewPending
 
 router = APIRouter(
@@ -37,10 +37,14 @@ def getPendingReview(db:Session=Depends(db.get_db), current_user: User = Depends
     if current_user.role!="USER":
         raise HTTPException(status_code=401, detail="Not Authorized")
 
-    medicine_orders = db.query(MedicineOrder) .filter(MedicineOrder.user_id == current_user.id).filter(MedicineOrder.reviewChecked == 0).filter(MedicineOrder.pharmacy.id ).all()
+    medicine_orders = db.query(MedicineOrder) .filter(MedicineOrder.user_id == current_user.id).filter(MedicineOrder.reviewChecked == 0).all()
+
     reviewsout = []
     for i in medicine_orders:
-        reviewout= ReviewPending(orderId=i.id,subjectId=i.pharmacy.id,subjectName=i.doctor.name)
+        if(i.pharmacy is None):
+            continue
+        pharmacyshop =db.query(Pharmacy).join(User).filter(User.id == i.pharmacy.id).first()
+        reviewout= ReviewPending(orderId=i.id,subjectId=i.pharmacy.id,pharmacy_name=pharmacyshop.pharmacy_name)
         reviewsout.append(reviewout)
     
     return reviewsout
