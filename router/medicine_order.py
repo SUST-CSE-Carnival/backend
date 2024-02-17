@@ -1,14 +1,33 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from models import User,Pharmacy, MedicineOrder
+from models import User,Pharmacy, MedicineOrder,Medicine
 from db import get_db
-from schemas import MedicineOrderCreate, MedicineOrderOut
+from schemas import MedicineOrderCreate, MedicineOrderOut, MedicineOrderInOCR, MedicineOrderOutOCR
 from oauth2 import get_current_user
 
 router = APIRouter(
     tags=["medicine_order"],
     prefix="/medicine_order"
 )
+
+@router.post("/ocr/create")
+def create_medicine_order_ocr(list:MedicineOrderInOCR, db:Session = Depends(get_db),current_user:User = Depends(get_current_user)):
+    
+    if current_user.role != "USER":
+        raise HTTPException(status_code=401, detail="Not Authorized")
+
+    cost = 0
+    return_list = MedicineOrderOutOCR(price=0,medicines=[])
+    for medicine in list.medicines:
+       medicine_db = db.query(Medicine).filter(Medicine.medicine_name.ilike(f"%{medicine.name}%")).first()
+       if medicine_db:
+            cost += medicine_db.price*medicine.quantity
+            return_list.medicines.append(medicine)
+    
+    return_list.price +=cost
+
+    return return_list
+
    
 @router.post("/create")
 def create_medicine_order(order:MedicineOrderCreate, db:Session = Depends(get_db),current_user:User = Depends(get_current_user)):

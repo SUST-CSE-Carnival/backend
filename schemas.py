@@ -1,5 +1,5 @@
 from pydantic import BaseModel,EmailStr
-
+from typing import List
 class UserSchema(BaseModel):
     id:int
     email:EmailStr
@@ -84,6 +84,18 @@ class MedicineOrderCreate(BaseModel):
         orm_mode = True
 
 
+class MedicineOCR(BaseModel):
+    name:str
+    quantity:int
+
+class MedicineOrderInOCR(BaseModel):
+    medicines:List[MedicineOCR]
+
+class MedicineOrderOutOCR(BaseModel):
+    medicines:List[MedicineOCR]
+    price :int
+
+
 class MedicineOrderOut(BaseModel):
     id:int
     user_id:int
@@ -102,6 +114,8 @@ class MedicineReminderIn(BaseModel):
     time:str
     days:str
     api_key:str
+
+
 
 class MedicineReminderOut(BaseModel):
     id:int

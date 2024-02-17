@@ -17,9 +17,9 @@ atexit.register(lambda: scheduler.shutdown())
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    trigger = IntervalTrigger(seconds=10)  # Run every 1 minute
+    trigger = IntervalTrigger(minutes=1)  # Run every 1 minute
     scheduler.add_job(sendMedincineReminders, trigger=trigger)
-    yield
+    yield   
     scheduler.shutdown()
 
 app = FastAPI(lifespan=lifespan)

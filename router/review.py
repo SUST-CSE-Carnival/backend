@@ -22,7 +22,7 @@ def addReview(review:str,star:int, reviewin: ReviewIn, db:Session=Depends(db.get
 
     medicine_order = db.query(MedicineOrder).filter(MedicineOrder.id == reviewin.orderId).first()
 
-    medicine_order.reviewchecked = 1
+    medicine_order.reviewChecked = 1
     db.add(medicine_order)
     db.commit()
     db.add(review)
@@ -49,19 +49,22 @@ def getPendingReview(db:Session=Depends(db.get_db), current_user: User = Depends
     
     return reviewsout
 
-@router.get("/{id}")
-def getReview(id:int, db:Session=Depends(db.get_db), current_user: User = Depends(oauth2.get_current_user)):
+@router.get("/all")
+def getReview(db:Session=Depends(db.get_db), current_user: User = Depends(oauth2.get_current_user)):
 
     if current_user.role!="USER" and current_user.role!="PHARMACY":
         raise HTTPException(status_code=404, detail="Not Authorized")
 
-    reviews = db.query(Review).filter(Review.subject_id == id).all()
+    reviews = db.query(Review).filter(Review.subject_id == current_user.id).all()
     reviewsout = []
     for i  in reviews:
         reviewout= ReviewOut(id=i.id,review=i.review,starCount=i.starCount,reviewerId=i.reviewer_id,subjectId=i.subject_id, reviewerName=i.reviewer.name)
         reviewsout.append(reviewout)
     
     return reviewsout
+
+
+
 
 
 
