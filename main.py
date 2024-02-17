@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import models
 from db import engine
-from router import auth
+from router import auth,medicine,medicine_order,medicine_reminder
 
 app = FastAPI()
 
@@ -23,3 +23,6 @@ def read_root():
 
 
 app.include_router(auth.router)
+app.include_router(medicine.router)
+app.include_router(medicine_order.router)
+app.include_router(medicine_reminder.router)

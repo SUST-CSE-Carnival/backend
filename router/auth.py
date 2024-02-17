@@ -41,3 +41,20 @@ def signup(user:schemas.UserSignup, db:Session = Depends(db.get_db)):
     db.commit()
     db.refresh(user)
     return user
+
+@router.post("/pharmacy/signup")
+def pharmacySignup(pharmacy:schemas.PharmacySignup, db:Session = Depends(db.get_db)):
+    user = pharmacy.user
+    user.password = utils.hash(user.password)
+    user = models.User(**user.model_dump())
+    user.role ="PHARMACY"
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    pharmacy = models.Pharmacy(pharmacy_name=pharmacy.pharmacy_name, bio=pharmacy.bio, place=pharmacy.place, user=user)
+    pharmacy.balance = 0
+    db.add(pharmacy)
+    db.commit()
+    db.refresh(pharmacy)
+    return pharmacy
+    

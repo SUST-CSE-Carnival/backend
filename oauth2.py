@@ -33,7 +33,7 @@ def verifyAccessToken(Token: str, credentialException):
     
     return tokenData
 
-def getCurrentUser(token : str= Depends(oauthScheme), db: Session = Depends(db.get_db)):
+def get_current_user(token : str= Depends(oauthScheme), db: Session = Depends(db.get_db)):
     credentialException = HTTPException(status_code=404, 
                                         detail="Token is invalid",
                                         headers={"WWW-Authenticate":"Bearer"})
